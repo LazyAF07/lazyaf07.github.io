@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LazyAF07 | Link Hub & Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts: Cinzel & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        darkCrimson: {
+                            950: '#0d0105',
+                            900: '#120208',
+                            800: '#220410',
+                            700: '#38061a',
+                            600: '#520826',
+                            500: '#730b35',
+                        },
+                        brandGold: '#facc15',
+                        softGold: '#fde047',
+                        crimsonText: '#fce7f3',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #120208 !important;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .crimson-card {
+            background-color: #220410;
+            border: 1.5px solid rgba(250, 204, 21, 0.3);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .crimson-card:hover {
+            transform: translateY(-2px);
+            background-color: #38061a;
+            border-color: rgba(250, 204, 21, 0.7);
+            box-shadow: 0 10px 25px -5px rgba(115, 11, 53, 0.6);
+        }
+
+        .edit-badge {
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(250, 204, 21, 0.4); }
+            50% { border-color: rgba(250, 204, 21, 0.9); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d0105;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #520826;
+            border-radius: 9999px;
+            border: 1px solid rgba(250, 204, 21, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-darkCrimson-900 min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 text-white selection:bg-darkCrimson-500 selection:text-white">
+
+    <!-- Ambient Crimson Background Glow -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-darkCrimson-600/30 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-darkCrimson-700/20 rounded-full blur-[140px]"></div>
+    </div>
+
+    <header class="w-full max-w-md flex justify-between items-center relative z-10 my-2">
+        <div class="flex items-center space-x-2">
+            <button id="editToggleBtn" onclick="toggleEditMode()" class="flex items-center space-x-2 text-xs font-bold px-3.5 py-1.5 rounded-full bg-darkCrimson-800 text-brandGold border border-brandGold/40 hover:border-brandGold transition-all">
+                <i class="fa-solid fa-sliders text-brandGold"></i>
+                <span id="editToggleText">Edit Mode: OFF</span>
+            </button>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button onclick="resetAllToDefault()" title="Reset to Default Content" class="p-2 rounded-full bg-darkCrimson-800 text-brandGold hover:text-white border border-brandGold/40 hover:border-brandGold text-xs font-bold transition-all">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+
+            <button onclick="copyProfileLink()" class="flex items-center space-x-2 bg-darkCrimson-800 hover:bg-darkCrimson-700 text-brandGold border border-brandGold/40 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 active:scale-95">
+                <i class="fa-solid fa-share-nodes text-brandGold"></i>
+                <span>Share</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-md my-auto relative z-10 flex flex-col items-center space-y-6">
+        
+        <div class="text-center flex flex-col items-center w-full">
+            
+            <!-- Avatar Box -->
+            <div class="relative group cursor-pointer mb-3" onclick="openAvatarModal()" title="Click to change profile picture">
+                <div class="absolute -inset-1.5 bg-gradient-to-r from-brandGold via-darkCrimson-500 to-softGold rounded-full blur-md opacity-80 group-hover:opacity-100 transition duration-300"></div>
+                <div class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-brandGold shadow-2xl bg-darkCrimson-950 flex items-center justify-center">
+                    <img id="avatarImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Avatar" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/200x200/220410/facc15?text=LAF07';">
+                    
+                    <div class="absolute inset-0 bg-darkCrimson-950/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-brandGold text-xs font-bold space-y-1">
+                        <i class="fa-solid fa-camera text-base"></i>
+                        <span>Change Pic</span>
+                    </div>
+                </div>
+                <div class="absolute bottom-1 right-1 bg-darkCrimson-700 text-brandGold p-2 rounded-full text-xs shadow-2xl border border-brandGold group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-pen"></i>
+                </div>
+            </div>
+
+            <!-- Profile Info Display Mode -->
+            <div id="profileDisplay" class="w-full flex flex-col items-center">
+                <h1 id="displayNameText" class="font-cinzel text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-md">
+                    LazyAF07
+                </h1>
+                <p id="handleText" class="text-xs font-bold text-brandGold tracking-widest uppercase mt-1">@lazy_af07</p>
+
+                <p id="bioScriptText" class="mt-3 text-sm text-crimsonText max-w-xs leading-relaxed font-medium">
+                    🍷 Crafting web fiction & dark romantic intrigues.<br>
+                    <span class="italic text-brandGold font-cinzel text-xs font-bold">"Worlds written in dark crimson."</span>
+                </p>
+                <button onclick="openProfileEditorModal()" class="edit-only-inline hidden mt-2 text-xs text-brandGold hover:underline font-bold bg-darkCrimson-800 px-3 py-1 rounded-full border border-brandGold/40">
+                    <i class="fa-solid fa-pencil text-[10px] mr-1"></i> Edit Header Text
+                </button>
+            </div>
+
+            <!-- Social Icons Quick Links -->
+            <div id="socialsContainer" class="flex items-center space-x-3 mt-4">
+                <!-- Dynamically Rendered Social Links -->
+            </div>
+        </div>
+
+        <div class="w-full relative">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-brandGold text-sm"></i>
+                <input type="text" id="searchInput" oninput="filterLinks()" placeholder="Search links or stories..." class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-2xl py-3 pl-11 pr-10 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brandGold focus:ring-1 focus:ring-brandGold transition-all font-medium">
+                <button id="clearSearch" onclick="resetSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-brandGold hover:text-white p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Add Link Button (Edit Mode Only) -->
+        <div id="addLinkContainer" class="w-full hidden">
+            <button onclick="openLinkModal()" class="w-full bg-darkCrimson-800 hover:bg-darkCrimson-700 text-brandGold border-2 border-dashed border-brandGold/60 hover:border-brandGold rounded-2xl py-3 px-4 font-bold text-sm flex items-center justify-center space-x-2 transition-all shadow-lg active:scale-98">
+                <i class="fa-solid fa-circle-plus text-base"></i>
+                <span>Add New Link Card</span>
+            </button>
+        </div>
+
+        <div id="linksContainer" class="w-full flex flex-col space-y-3.5">
+            <!-- Dynamically populated link cards -->
+        </div>
+
+        <!-- Empty state when searching -->
+        <div id="noResults" class="hidden text-center py-8">
+            <i class="fa-solid fa-book-skull text-3xl text-brandGold mb-2"></i>
+            <p class="text-sm font-semibold text-brandGold">No links found matching your query.</p>
+        </div>
+
+    </main>
+
+    <footer class="w-full max-w-md text-center py-6 relative z-10">
+        <p class="text-xs text-crimsonText font-medium">
+            © <span id="currentYear"></span> <span id="footerBrand" class="text-brandGold font-bold">LazyAF07 Realm</span> • Dark Crimson & Quill
+        </p>
+    </footer>
+
+    <!-- 1. Profile Picture Modal -->
+    <div id="avatarModal" class="fixed inset-0 bg-darkCrimson-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-darkCrimson-800 border-2 border-brandGold rounded-3xl p-6 w-full max-w-sm shadow-2xl relative text-left">
+            <button onclick="closeAvatarModal()" class="absolute top-4 right-4 text-brandGold hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <h2 class="font-cinzel text-xl font-bold text-brandGold flex items-center space-x-2">
+                <i class="fa-solid fa-user-pen text-sm"></i>
+                <span>Change Profile Pic</span>
+            </h2>
+            <p class="text-xs text-crimsonText mt-1 font-medium">Upload photo, paste web URL, or select a preset avatar.</p>
+
+            <div class="mt-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-brandGold mb-1.5">Upload Local Image</label>
+                    <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)" class="block w-full text-xs text-white file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-darkCrimson-700 file:text-brandGold hover:file:bg-darkCrimson-600 cursor-pointer bg-darkCrimson-950 rounded-xl p-1 border border-brandGold/40">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-brandGold mb-1.5">Paste Image Link</label>
+                    <div class="flex space-x-2">
+                        <input type="url" id="urlInput" placeholder="https://example.com/image.jpg" class="flex-1 bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-brandGold font-medium">
+                        <button onclick="applyUrlAvatar()" class="bg-brandGold text-darkCrimson-950 px-3.5 py-2 rounded-xl text-xs font-extrabold hover:bg-softGold transition-colors">Apply</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-brandGold mb-2">Preset Avatars</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="selectPreset('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80')" class="w-14 h-14 rounded-full overflow-hidden border-2 border-transparent hover:border-brandGold transition-all">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" class="w-full h-full object-cover" alt="Preset 1">
+                        </button>
+                        <button onclick="selectPreset('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80')" class="w-14 h-14 rounded-full overflow-hidden border-2 border-transparent hover:border-brandGold transition-all">
+                            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80" class="w-full h-full object-cover" alt="Preset 2">
+                        </button>
+                        <button onclick="selectPreset('https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80')" class="w-14 h-14 rounded-full overflow-hidden border-2 border-transparent hover:border-brandGold transition-all">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80" class="w-full h-full object-cover" alt="Preset 3">
+                        </button>
+                        <button onclick="selectPreset('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80')" class="w-14 h-14 rounded-full overflow-hidden border-2 border-transparent hover:border-brandGold transition-all">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" class="w-full h-full object-cover" alt="Preset 4">
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-brandGold/30 flex justify-between items-center">
+                <button onclick="closeAvatarModal()" class="bg-darkCrimson-700 hover:bg-darkCrimson-600 text-brandGold border border-brandGold/40 px-4 py-2 rounded-xl text-xs font-bold w-full">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Header Text Editor Modal -->
+    <div id="profileEditorModal" class="fixed inset-0 bg-darkCrimson-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-darkCrimson-800 border-2 border-brandGold rounded-3xl p-6 w-full max-w-sm shadow-2xl relative text-left">
+            <button onclick="closeProfileEditorModal()" class="absolute top-4 right-4 text-brandGold hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <h2 class="font-cinzel text-xl font-bold text-brandGold flex items-center space-x-2">
+                <i class="fa-solid fa-pen-to-square text-sm"></i>
+                <span>Edit Profile Header</span>
+            </h2>
+
+            <div class="mt-4 space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-brandGold mb-1">Display Name</label>
+                    <input type="text" id="editDisplayName" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brandGold font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brandGold mb-1">Handle / Username</label>
+                    <input type="text" id="editHandle" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brandGold font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brandGold mb-1">Bio Description</label>
+                    <textarea id="editBioScript" rows="3" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brandGold font-medium"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-brandGold/30 flex justify-end space-x-2">
+                <button onclick="closeProfileEditorModal()" class="px-3 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white">Cancel</button>
+                <button onclick="saveProfileHeader()" class="bg-brandGold text-darkCrimson-950 px-4 py-2 rounded-xl text-xs font-extrabold hover:bg-softGold">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Add / Edit Link Card Modal -->
+    <div id="linkModal" class="fixed inset-0 bg-darkCrimson-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto">
+        <div class="bg-darkCrimson-800 border-2 border-brandGold rounded-3xl p-6 w-full max-w-sm shadow-2xl relative text-left my-8">
+            <button onclick="closeLinkModal()" class="absolute top-4 right-4 text-brandGold hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <h2 id="linkModalTitle" class="font-cinzel text-xl font-bold text-brandGold flex items-center space-x-2">
+                <i class="fa-solid fa-link text-sm"></i>
+                <span>Edit Link Card</span>
+            </h2>
+
+            <input type="hidden" id="editLinkId">
+
+            <div class="mt-4 space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-brandGold mb-1">Platform Title</label>
+                    <input type="text" id="linkTitleInput" placeholder="e.g. Wattpad" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brandGold font-medium">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-brandGold mb-1">Subtext / Description</label>
+                    <input type="text" id="linkDescInput" placeholder="e.g. Read web novels & ongoing series" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brandGold font-medium">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-brandGold mb-1">Target Web URL</label>
+                    <input type="url" id="linkUrlInput" placeholder="https://..." class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brandGold font-medium">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-brandGold mb-1">Badge Tag (Optional)</label>
+                    <input type="text" id="linkBadgeInput" placeholder="e.g. Primary, Early Access, Exclusive" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brandGold font-medium">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-brandGold mb-1">Icon Type</label>
+                    <select id="iconTypeSelect" onchange="toggleIconFields()" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brandGold font-medium">
+                        <option value="fa">FontAwesome Class</option>
+                        <option value="preset">Preset Platform SVG</option>
+                        <option value="image">Web Image URL</option>
+                        <option value="file">Custom Local File / Gallery</option>
+                    </select>
+                </div>
+
+                <div id="iconFaGroup">
+                    <label class="block font-bold text-brandGold mb-1">FontAwesome Class</label>
+                    <input type="text" id="linkFaIconInput" placeholder="fa-solid fa-book-open" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brandGold font-medium">
+                    <span class="text-[10px] text-gray-400">e.g., fa-solid fa-feather, fa-brands fa-patreon, fa-brands fa-instagram</span>
+                </div>
+
+                <div id="iconPresetGroup" class="hidden">
+                    <label class="block font-bold text-brandGold mb-1">Select Preset SVG Logo</label>
+                    <select id="linkPresetIconSelect" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brandGold font-medium">
+                        <option value="wattpad">Wattpad Official Logo</option>
+                        <option value="inkitt">Inkitt Book Reader</option>
+                        <option value="patreon">Patreon Brand</option>
+                        <option value="scrollstack">Scrollstack Quill</option>
+                        <option value="goodnovel">GoodNovel Bookmark</option>
+                        <option value="instagram">Instagram Camera</option>
+                    </select>
+                </div>
+
+                <div id="iconImgGroup" class="hidden">
+                    <label class="block font-bold text-brandGold mb-1">Custom Icon Image URL</label>
+                    <input type="url" id="linkImgIconInput" placeholder="https://example.com/logo.png" class="w-full bg-darkCrimson-950 border border-brandGold/40 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-brandGold font-medium">
+                </div>
+
+                <div id="iconFileGroup" class="hidden">
+                    <label class="block font-bold text-brandGold mb-1">Choose Image from Device</label>
+                    <input type="file" id="linkFileInput" accept="image/*" onchange="handleLinkLogoUpload(event)" class="block w-full text-xs text-white file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-darkCrimson-700 file:text-brandGold hover:file:bg-darkCrimson-600 cursor-pointer bg-darkCrimson-950 rounded-xl p-1 border border-brandGold/40">
+                    <div id="linkFilePreview" class="mt-2 flex items-center space-x-2 hidden">
+                        <img id="linkFilePreviewImg" class="w-8 h-8 rounded-lg object-cover border border-brandGold" alt="Preview">
+                        <span class="text-[10px] text-green-400 font-bold">Logo loaded!</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-brandGold/30 flex justify-end space-x-2">
+                <button onclick="closeLinkModal()" class="px-3 py-2 rounded-xl text-xs font-bold text-gray-300 hover:text-white">Cancel</button>
+                <button onclick="saveLinkCard()" class="bg-brandGold text-darkCrimson-950 px-4 py-2 rounded-xl text-xs font-extrabold hover:bg-softGold">Save Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-darkCrimson-800 text-brandGold px-5 py-2.5 rounded-full text-xs font-bold shadow-2xl border border-brandGold opacity-0 pointer-events-none z-50 flex items-center space-x-2 transition-all duration-300">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMsg">Action completed!</span>
+    </div>
+
+    <script>
+        // Preset SVGs and Icons
+        const PRESET_SVGS = {
+            wattpad: `<svg class="w-7 h-7 flex-shrink-0" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M72.1 120.3C38.6 120.3 12 153.1 12 216.9C12 299.7 70.8 412.3 148.8 412.3C185.3 412.3 218.1 386.9 239.5 351.4C261.2 387.9 298.1 412.3 342.3 412.3C397.6 412.3 440.8 375.3 464.7 325.2C488.6 275.1 500 213.9 500 167.3C500 142.1 490.8 120.3 470.8 120.3C453.6 120.3 439.1 135.2 423.8 158.7C395.7 201.8 368.1 268.4 353.4 316.2C345.2 342.8 335.7 363.3 325.3 363.3C316.7 363.3 311.2 352.8 311.2 334.3C311.2 312.8 318.1 283.4 326.3 252.3C337.5 209.8 348.7 167.3 348.7 134.3C348.7 101.3 328.1 80 293.3 80C253.2 80 215.1 118.8 190.1 161.8C179.3 180.3 170.8 199.8 165.2 213.3C161.6 222.1 158.1 230.8 155.6 237.3C148.2 216.3 142.6 182.3 142.6 156.3C142.6 135.3 129.8 120.3 108.8 120.3C96.3 120.3 84.1 120.3 72.1 120.3Z" fill="#FF5000"/>
+            </svg>`,
+            inkitt: `<i class="fa-solid fa-book-open text-xl text-brandGold"></i>`,
+            patreon: `<i class="fa-brands fa-patreon text-xl text-red-400"></i>`,
+            scrollstack: `<i class="fa-solid fa-feather-pointed text-xl text-emerald-400"></i>`,
+            goodnovel: `<i class="fa-solid fa-bookmark text-xl text-purple-300"></i>`,
+            instagram: `<i class="fa-brands fa-instagram text-2xl text-pink-400"></i>`
+        };
+
+        // Default Data State
+        const DEFAULT_DATA = {
+            profile: {
+                displayName: "LazyAF07",
+                handle: "@lazy_af07",
+                bioScript: `🍷 Crafting web fiction & dark romantic intrigues.\n"Worlds written in dark crimson."`,
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
+            },
+            links: [
+                {
+                    id: "link_1",
+                    title: "Wattpad",
+                    desc: "Read web novels & ongoing series",
+                    url: "https://www.wattpad.com/user/LazyAF07",
+                    badge: "Primary",
+                    iconType: "preset",
+                    iconValue: "wattpad"
+                },
+                {
+                    id: "link_2",
+                    title: "Inkitt",
+                    desc: "Free novels & reader community",
+                    url: "https://www.inkitt.com/LazyAF07",
+                    badge: "",
+                    iconType: "preset",
+                    iconValue: "inkitt"
+                },
+                {
+                    id: "link_3",
+                    title: "Patreon",
+                    desc: "Support & get early chapters",
+                    url: "https://www.patreon.com/cw/LazyAF070902",
+                    badge: "Early Access",
+                    iconType: "preset",
+                    iconValue: "patreon"
+                },
+                {
+                    id: "link_4",
+                    title: "Scrollstack",
+                    desc: "Short stories & creative prose",
+                    url: "https://lazyaf07.stck.me/",
+                    badge: "",
+                    iconType: "preset",
+                    iconValue: "scrollstack"
+                },
+                {
+                    id: "link_5",
+                    title: "GoodNovel",
+                    desc: "Published Web Novel Catalog",
+                    url: "https://www.goodnovel.com/author/72123031",
+                    badge: "",
+                    iconType: "preset",
+                    iconValue: "goodnovel"
+                },
+                {
+                    id: "link_6",
+                    title: "Instagram",
+                    desc: "Behind-the-scenes & announcements",
+                    url: "https://www.instagram.com/lazy_af07/",
+                    badge: "",
+                    iconType: "preset",
+                    iconValue: "instagram"
+                }
+            ]
+        };
+
+        // Application State
+        let isEditMode = false;
+        let hubData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        let uploadedLogoBase64 = '';
+
+        window.onload = function() {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            loadState();
+            renderAll();
+        };
+
+        function saveState() {
+            try {
+                localStorage.setItem('lazyAF07_hub_data', JSON.stringify(hubData));
+            } catch(e) {
+                console.warn('LocalStorage limit exceeded or disabled');
+            }
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('lazyAF07_hub_data');
+            if (saved) {
+                try {
+                    hubData = JSON.parse(saved);
+                } catch(e) {
+                    hubData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                }
+            }
+        }
+
+        function resetAllToDefault() {
+            localStorage.removeItem('lazyAF07_hub_data');
+            hubData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+            renderAll();
+            showToast("Reset to default configuration!");
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const btnText = document.getElementById('editToggleText');
+            const btn = document.getElementById('editToggleBtn');
+            
+            if (isEditMode) {
+                btnText.textContent = "Edit Mode: ON";
+                btn.classList.add('bg-brandGold', 'text-darkCrimson-950', 'border-white');
+                btn.classList.remove('bg-darkCrimson-800', 'text-brandGold');
+                showToast("Edit mode activated");
+            } else {
+                btnText.textContent = "Edit Mode: OFF";
+                btn.classList.remove('bg-brandGold', 'text-darkCrimson-950', 'border-white');
+                btn.classList.add('bg-darkCrimson-800', 'text-brandGold');
+                showToast("Edit mode disabled");
+            }
+
+            renderAll();
+        }
+
+        function renderAll() {
+            renderHeader();
+            renderSocials();
+            renderLinks();
+            
+            const addBtn = document.getElementById('addLinkContainer');
+            if (isEditMode) {
+                addBtn.classList.remove('hidden');
+                document.querySelectorAll('.edit-only-inline').forEach(el => el.classList.remove('hidden'));
+            } else {
+                addBtn.classList.add('hidden');
+                document.querySelectorAll('.edit-only-inline').forEach(el => el.classList.add('hidden'));
+            }
+        }
+
+        function renderHeader() {
+            document.getElementById('avatarImg').src = hubData.profile.avatar;
+            document.getElementById('displayNameText').textContent = hubData.profile.displayName;
+            document.getElementById('handleText').textContent = hubData.profile.handle;
+            document.getElementById('footerBrand').textContent = hubData.profile.displayName + " Realm";
+            
+            const bioLines = hubData.profile.bioScript.split('\n');
+            if (bioLines.length > 1) {
+                document.getElementById('bioScriptText').innerHTML = `${escapeHTML(bioLines[0])}<br><span class="italic text-brandGold font-cinzel text-xs font-bold">${escapeHTML(bioLines.slice(1).join(' '))}</span>`;
+            } else {
+                document.getElementById('bioScriptText').innerHTML = escapeHTML(hubData.profile.bioScript);
+            }
+        }
+
+        // Render Quick Social Icons
+        function renderSocials() {
+            const container = document.getElementById('socialsContainer');
+            container.innerHTML = '';
+            
+            hubData.links.forEach(link => {
+                const iconHtml = getIconHTML(link.iconType, link.iconValue);
+                const btn = document.createElement('a');
+                btn.href = link.url;
+                btn.target = "_blank";
+                btn.rel = "noopener noreferrer";
+                btn.title = link.title;
+                btn.className = "w-10 h-10 rounded-full bg-darkCrimson-800 hover:bg-darkCrimson-700 border border-brandGold/40 hover:border-brandGold flex items-center justify-center transition-all hover:scale-110 shadow-lg";
+                btn.innerHTML = iconHtml;
+                container.appendChild(btn);
+            });
+        }
+
+        function renderLinks() {
+            const container = document.getElementById('linksContainer');
+            container.innerHTML = '';
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = hubData.links.filter(link => 
+                link.title.toLowerCase().includes(searchTerm) || 
+                link.desc.toLowerCase().includes(searchTerm) ||
+                (link.badge && link.badge.toLowerCase().includes(searchTerm))
+            );
+
+            const noResults = document.getElementById('noResults');
+            if (filtered.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            filtered.forEach((link, index) => {
+                const card = document.createElement('div');
+                card.className = `crimson-card rounded-2xl p-3.5 sm:p-4 flex items-center justify-between group cursor-pointer relative ${isEditMode ? 'edit-badge' : ''}`;
+                
+                const iconContent = getIconHTML(link.iconType, link.iconValue);
+
+                card.innerHTML = `
+                    <a href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3.5 flex-1 min-w-0 pr-2">
+                        <div class="w-12 h-12 rounded-xl bg-darkCrimson-950/80 border border-brandGold/40 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform overflow-hidden p-1">
+                            ${iconContent}
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                            <div class="flex items-center space-x-2">
+                                <h3 class="font-bold text-sm text-white group-hover:text-brandGold transition-colors truncate font-cinzel tracking-wide">${escapeHTML(link.title)}</h3>
+                                ${link.badge ? `<span class="bg-brandGold/20 text-brandGold border border-brandGold/50 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">${escapeHTML(link.badge)}</span>` : ''}
+                            </div>
+                            <p class="text-xs text-gray-300 font-medium truncate mt-0.5">${escapeHTML(link.desc)}</p>
+                        </div>
+                    </a>
+
+                    ${isEditMode ? `
+                        <div class="flex items-center space-x-1 pl-2 border-l border-brandGold/20">
+                            <button onclick="moveLink(${index}, -1)" class="p-1.5 text-gray-400 hover:text-brandGold transition-colors" title="Move Up">
+                                <i class="fa-solid fa-arrow-up text-xs"></i>
+                            </button>
+                            <button onclick="moveLink(${index}, 1)" class="p-1.5 text-gray-400 hover:text-brandGold transition-colors" title="Move Down">
+                                <i class="fa-solid fa-arrow-down text-xs"></i>
+                            </button>
+                            <button onclick="openLinkModal('${link.id}')" class="p-1.5 text-brandGold hover:text-white transition-colors" title="Edit Link">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </button>
+                            <button onclick="deleteLink('${link.id}')" class="p-1.5 text-red-400 hover:text-red-300 transition-colors" title="Delete Link">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    ` : `
+                        <div class="text-brandGold/60 group-hover:text-brandGold group-hover:translate-x-1 transition-all pl-2">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </div>
+                    `}
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Helper: Convert icon setup into HTML string
+        function getIconHTML(type, value) {
+            if (type === 'preset' && PRESET_SVGS[value]) {
+                return PRESET_SVGS[value];
+            } else if (type === 'fa' && value) {
+                return `<i class="${escapeHTML(value)} text-xl text-brandGold"></i>`;
+            } else if ((type === 'image' || type === 'file') && value) {
+                return `<img src="${escapeHTML(value)}" class="w-full h-full object-cover rounded-lg" onerror="this.onerror=null; this.src='https://placehold.co/100x100/220410/facc15?text=Link';">`;
+            }
+            return `<i class="fa-solid fa-link text-xl text-brandGold"></i>`;
+        }
+
+        function filterLinks() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearSearch');
+            if (input.value.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            renderLinks();
+        }
+
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearch').classList.add('hidden');
+            renderLinks();
+        }
+
+        function copyProfileLink() {
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            showToast("Link copied to clipboard!");
+        }
+
+        // --- Avatar Modal Logic ---
+        function openAvatarModal() {
+            document.getElementById('avatarModal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeAvatarModal() {
+            document.getElementById('avatarModal').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function selectPreset(url) {
+            hubData.profile.avatar = url;
+            saveState();
+            renderHeader();
+            closeAvatarModal();
+            showToast("Avatar updated!");
+        }
+
+        function applyUrlAvatar() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (url) {
+                hubData.profile.avatar = url;
+                saveState();
+                renderHeader();
+                document.getElementById('urlInput').value = '';
+                closeAvatarModal();
+                showToast("Avatar updated from link!");
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    hubData.profile.avatar = e.target.result;
+                    saveState();
+                    renderHeader();
+                    closeAvatarModal();
+                    showToast("Profile image uploaded!");
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- Profile Text Editor Modal Logic ---
+        function openProfileEditorModal() {
+            document.getElementById('editDisplayName').value = hubData.profile.displayName;
+            document.getElementById('editHandle').value = hubData.profile.handle;
+            document.getElementById('editBioScript').value = hubData.profile.bioScript;
+            document.getElementById('profileEditorModal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeProfileEditorModal() {
+            document.getElementById('profileEditorModal').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function saveProfileHeader() {
+            hubData.profile.displayName = document.getElementById('editDisplayName').value.trim() || "LazyAF07";
+            hubData.profile.handle = document.getElementById('editHandle').value.trim() || "@lazy_af07";
+            hubData.profile.bioScript = document.getElementById('editBioScript').value.trim();
+            
+            saveState();
+            renderHeader();
+            closeProfileEditorModal();
+            showToast("Profile header updated!");
+        }
+
+        function openLinkModal(linkId = null) {
+            uploadedLogoBase64 = '';
+            document.getElementById('linkFileInput').value = '';
+            document.getElementById('linkFilePreview').classList.add('hidden');
+
+            if (linkId) {
+                const link = hubData.links.find(l => l.id === linkId);
+                if (link) {
+                    document.getElementById('linkModalTitle').innerText = "Edit Link Card";
+                    document.getElementById('editLinkId').value = link.id;
+                    document.getElementById('linkTitleInput').value = link.title;
+                    document.getElementById('linkDescInput').value = link.desc;
+                    document.getElementById('linkUrlInput').value = link.url;
+                    document.getElementById('linkBadgeInput').value = link.badge || '';
+                    document.getElementById('iconTypeSelect').value = link.iconType || 'fa';
+                    
+                    toggleIconFields();
+
+                    if (link.iconType === 'fa') document.getElementById('linkFaIconInput').value = link.iconValue;
+                    if (link.iconType === 'preset') document.getElementById('linkPresetIconSelect').value = link.iconValue;
+                    if (link.iconType === 'image') document.getElementById('linkImgIconInput').value = link.iconValue;
+                    if (link.iconType === 'file') {
+                        uploadedLogoBase64 = link.iconValue;
+                        document.getElementById('linkFilePreviewImg').src = link.iconValue;
+                        document.getElementById('linkFilePreview').classList.remove('hidden');
+                    }
+                }
+            } else {
+                document.getElementById('linkModalTitle').innerText = "Add New Link Card";
+                document.getElementById('editLinkId').value = '';
+                document.getElementById('linkTitleInput').value = '';
+                document.getElementById('linkDescInput').value = '';
+                document.getElementById('linkUrlInput').value = '';
+                document.getElementById('linkBadgeInput').value = '';
+                document.getElementById('iconTypeSelect').value = 'fa';
+                document.getElementById('linkFaIconInput').value = 'fa-solid fa-link';
+                toggleIconFields();
+            }
+
+            document.getElementById('linkModal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeLinkModal() {
+            document.getElementById('linkModal').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function toggleIconFields() {
+            const type = document.getElementById('iconTypeSelect').value;
+            document.getElementById('iconFaGroup').classList.toggle('hidden', type !== 'fa');
+            document.getElementById('iconPresetGroup').classList.toggle('hidden', type !== 'preset');
+            document.getElementById('iconImgGroup').classList.toggle('hidden', type !== 'image');
+            document.getElementById('iconFileGroup').classList.toggle('hidden', type !== 'file');
+        }
+
+        function handleLinkLogoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    uploadedLogoBase64 = event.target.result;
+                    document.getElementById('linkFilePreviewImg').src = uploadedLogoBase64;
+                    document.getElementById('linkFilePreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveLinkCard() {
+            const id = document.getElementById('editLinkId').value;
+            const title = document.getElementById('linkTitleInput').value.trim();
+            const desc = document.getElementById('linkDescInput').value.trim();
+            const url = document.getElementById('linkUrlInput').value.trim();
+            const badge = document.getElementById('linkBadgeInput').value.trim();
+            const iconType = document.getElementById('iconTypeSelect').value;
+
+            if (!title || !url) {
+                showToast("Title and Web URL are required!");
+                return;
+            }
+
+            let iconValue = '';
+            if (iconType === 'fa') iconValue = document.getElementById('linkFaIconInput').value.trim() || 'fa-solid fa-link';
+            if (iconType === 'preset') iconValue = document.getElementById('linkPresetIconSelect').value;
+            if (iconType === 'image') iconValue = document.getElementById('linkImgIconInput').value.trim();
+            if (iconType === 'file') iconValue = uploadedLogoBase64;
+
+            if (id) {
+                // Update existing
+                const index = hubData.links.findIndex(l => l.id === id);
+                if (index !== -1) {
+                    hubData.links[index] = { id, title, desc, url, badge, iconType, iconValue };
+                }
+            } else {
+                // Create new
+                const newId = 'link_' + Date.now();
+                hubData.links.push({ id: newId, title, desc, url, badge, iconType, iconValue });
+            }
+
+            saveState();
+            renderAll();
+            closeLinkModal();
+            showToast("Link card saved successfully!");
+        }
+
+        function deleteLink(id) {
+            hubData.links = hubData.links.filter(l => l.id !== id);
+            saveState();
+            renderAll();
+            showToast("Link removed!");
+        }
+
+        function moveLink(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex >= 0 && targetIndex < hubData.links.length) {
+                const temp = hubData.links[index];
+                hubData.links[index] = hubData.links[targetIndex];
+                hubData.links[targetIndex] = temp;
+                saveState();
+                renderAll();
+            }
+        }
+
+        // Helper Utility Functions
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
